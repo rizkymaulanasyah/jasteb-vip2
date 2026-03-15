@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Jasteb Otomatis • QRIS Rizky Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-1: #010817;
+        --bg-2: #07152f;
+        --card: rgba(7, 21, 47, 0.92);
+        --stroke: rgba(70, 130, 255, 0.24);
+        --input: rgba(12, 28, 58, 0.9);
+        --text: #f5f9ff;
+        --muted: #8ea6d8;
+        --primary: #3f87ff;
+        --primary-2: #2468f2;
+        --gold: #ffd24a;
+        --success: #8bffb0;
+        --danger: #ff7a7a;
+        --danger-bg: rgba(255, 60, 60, 0.1);
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+      }
+
+      body {
+        min-height: 100vh;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(63, 135, 255, 0.12),
+            transparent 28%
+          ),
+          radial-gradient(
+            circle at 80% 30%,
+            rgba(0, 255, 200, 0.06),
+            transparent 20%
+          ),
+          radial-gradient(
+            circle at 50% 100%,
+            rgba(255, 210, 74, 0.05),
+            transparent 22%
+          ),
+          linear-gradient(135deg, var(--bg-1), #020d21 45%, var(--bg-2));
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(63, 135, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(63, 135, 255, 0.03) 1px, transparent 1px);
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          circle at center,
+          black 35%,
+          transparent 85%
+        );
+      }
+
+      .app {
+        width: 100%;
+        max-width: 470px;
+        position: relative;
+      }
+
+      .screen {
+        position: relative;
+        width: 100%;
+        border-radius: 28px;
+        background: linear-gradient(
+          180deg,
+          rgba(7, 21, 47, 0.96),
+          rgba(4, 15, 36, 0.92)
+        );
+        border: 1px solid var(--stroke);
+        padding: 26px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        overflow: hidden;
+        animation: floating 4s ease-in-out infinite;
+      }
+
+      .screen::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: 28px;
+        padding: 1px;
+        background: linear-gradient(
+          135deg,
+          rgba(63, 135, 255, 0.45),
+          rgba(139, 255, 176, 0.08),
+          rgba(255, 210, 74, 0.25)
+        );
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .screen::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        top: -70px;
+        right: -70px;
+        background: radial-gradient(
+          circle,
+          rgba(63, 135, 255, 0.18),
+          transparent 65%
+        );
+        filter: blur(8px);
+        pointer-events: none;
+      }
+
+      @keyframes floating {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .top-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        background: rgba(63, 135, 255, 0.08);
+        border: 1px solid rgba(63, 135, 255, 0.16);
+        color: var(--primary);
+        font-size: 24px;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        color: #b9ffd2;
+        background: rgba(139, 255, 176, 0.08);
+        border: 1px solid rgba(139, 255, 176, 0.15);
+        margin-bottom: 18px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 10px var(--success);
+        animation: pulse 1.8s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.35);
+          opacity: 0.65;
+        }
+      }
+
+      .icon-wrap {
+        width: 74px;
+        height: 74px;
+        margin: 8px auto 14px;
+        border-radius: 22px;
+        display: grid;
+        place-items: center;
+        font-size: 34px;
+        background: linear-gradient(
+          145deg,
+          rgba(255, 210, 74, 0.12),
+          rgba(63, 135, 255, 0.08)
+        );
+        border: 1px solid rgba(255, 210, 74, 0.15);
+      }
+
+      h1,
+      h2 {
+        font-family: "Orbitron", sans-serif;
+        text-align: center;
+        line-height: 1.2;
+        text-shadow: 0 0 18px rgba(63, 135, 255, 0.14);
+      }
+
+      h1 {
+        font-size: clamp(24px, 5vw, 34px);
+        margin-bottom: 12px;
+      }
+      h2 {
+        font-size: clamp(20px, 4vw, 28px);
+        margin-bottom: 18px;
+      }
+
+      .subtitle {
+        width: fit-content;
+        margin: 0 auto 24px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        color: #88b5ff;
+        background: rgba(63, 135, 255, 0.06);
+        border: 1px solid rgba(63, 135, 255, 0.16);
+      }
+
+      .field {
+        margin-bottom: 18px;
+      }
+
+      .label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      .input-wrap span {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #7aa8ff;
+        font-size: 18px;
+      }
+
+      .input-wrap input {
+        width: 100%;
+        padding: 16px 16px 16px 48px;
+        border-radius: 16px;
+        border: 1px solid rgba(63, 135, 255, 0.14);
+        background: var(--input);
+        color: var(--text);
+        outline: none;
+        font-size: 15px;
+        transition: 0.3s ease;
+      }
+
+      .input-wrap input:focus {
+        border-color: rgba(63, 135, 255, 0.45);
+        box-shadow: 0 0 0 4px rgba(63, 135, 255, 0.08);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .option input {
+        display: none;
+      }
+
+      .option label {
+        display: block;
+        cursor: pointer;
+        min-height: 76px;
+        border-radius: 18px;
+        padding: 14px 10px;
+        text-align: center;
+        user-select: none;
+        background: rgba(13, 28, 60, 0.78);
+        border: 1px solid rgba(63, 135, 255, 0.18);
+        transition: 0.25s ease;
+      }
+
+      .option label:hover {
+        transform: translateY(-4px);
+        border-color: rgba(63, 135, 255, 0.34);
+        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.18);
+      }
+
+      .option input:checked + label {
+        transform: translateY(-3px);
+        background: linear-gradient(
+          180deg,
+          rgba(63, 135, 255, 0.2),
+          rgba(36, 104, 242, 0.16)
+        );
+        border-color: rgba(63, 135, 255, 0.55);
+        box-shadow:
+          0 0 0 2px rgba(63, 135, 255, 0.12),
+          inset 0 0 18px rgba(63, 135, 255, 0.06);
+      }
+
+      .price {
+        display: block;
+        color: #6eb4ff;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .count {
+        font-size: 18px;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .summary {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(63, 135, 255, 0.06);
+        border: 1px solid rgba(63, 135, 255, 0.12);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .summary small,
+      .note,
+      .qris-note,
+      .payment-hint {
+        color: var(--muted);
+      }
+
+      .summary small {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .summary strong {
+        font-size: 18px;
+      }
+
+      .note {
+        margin-top: 12px;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .btn,
+      .btn-secondary {
+        width: 100%;
+        border: none;
+        cursor: pointer;
+        border-radius: 18px;
+        padding: 17px;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        transition: 0.25s ease;
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn {
+        margin-top: 18px;
+        color: white;
+        background: linear-gradient(90deg, var(--primary), var(--primary-2));
+        box-shadow: 0 18px 30px rgba(36, 104, 242, 0.28);
+      }
+
+      .btn:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 22px 35px rgba(36, 104, 242, 0.35);
+      }
+
+      .btn-secondary {
+        margin-top: 12px;
+        color: #cde0ff;
+        background: rgba(63, 135, 255, 0.08);
+        border: 1px solid rgba(63, 135, 255, 0.18);
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        background: rgba(63, 135, 255, 0.12);
+      }
+
+      .foot {
+        text-align: center;
+        margin-top: 14px;
+        color: #6f89bd;
+        font-size: 12px;
+      }
+
+      .qris-box {
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 12px;
+        margin: 12px auto 18px;
+        width: fit-content;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      .qris-box img {
+        display: block;
+        width: min(100%, 330px);
+        max-width: 330px;
+        border-radius: 14px;
+      }
+
+      .payment-card {
+        margin-top: 10px;
+        border-radius: 20px;
+        padding: 18px;
+        background: rgba(10, 27, 58, 0.9);
+        border: 1px solid rgba(63, 135, 255, 0.2);
+        text-align: center;
+      }
+
+      .payment-card .mini {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6f89bd;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .payment-amount {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(28px, 6vw, 38px);
+        color: #66a8ff;
+        margin-bottom: 8px;
+      }
+
+      .payment-hint {
+        font-size: 12px;
+        color: var(--gold);
+        font-style: italic;
+      }
+
+      .timer-box {
+        margin-top: 16px;
+        border-radius: 18px;
+        padding: 16px;
+        text-align: center;
+        background: rgba(255, 80, 80, 0.08);
+        border: 1px solid rgba(255, 120, 120, 0.16);
+        color: #ff8b8b;
+        font-family: "Orbitron", sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .timer-label {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: #ffb0b0;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        font-family: "Inter", sans-serif;
+      }
+
+      .qris-note {
+        margin-top: 12px;
+        font-size: 12px;
+        text-align: center;
+        line-height: 1.6;
+      }
+
+      .merchant {
+        text-align: center;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: #a9c3ff;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+      }
+
+      .alert {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        font-size: 13px;
+        display: none;
+      }
+
+      .alert.show {
+        display: block;
+      }
+      .alert.error {
+        background: rgba(255, 80, 80, 0.08);
+        border: 1px solid rgba(255, 120, 120, 0.18);
+        color: #ff9a9a;
+      }
+      .alert.success {
+        background: rgba(139, 255, 176, 0.08);
+        border: 1px solid rgba(139, 255, 176, 0.18);
+        color: #b9ffd2;
+      }
+
+      @media (max-width: 520px) {
+        body {
+          padding: 16px;
+        }
+        .screen {
+          padding: 20px;
+          border-radius: 24px;
+        }
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .top-badge {
+          width: 46px;
+          height: 46px;
+          font-size: 20px;
+        }
+        .qris-box img {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- SCREEN 1 : FORM ORDER -->
+      <div class="screen" id="orderScreen">
+        <div class="top-badge">⌘</div>
+
+        <div class="status">
+          <span class="dot"></span>
+          Secure Payment Gateway Aktif
+        </div>
+
+        <div class="icon-wrap">🏅</div>
+        <h1>Order Jasteb Otomatis</h1>
+        <div class="subtitle">Premium Panel • Fast Process • Auto System</div>
+
+        <div class="field">
+          <label class="label">Target Email *</label>
+          <div class="input-wrap">
+            <span>✉</span>
+            <input
+              type="email"
+              id="emailInput"
+              placeholder="contohemail@gmail.com"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Pilih Paket *</label>
+          <div class="grid">
+            <div class="option">
+              <input
+                type="radio"
+                id="p1"
+                name="paket"
+                value="10000"
+                data-label="Rp10.000 • 99+"
+                data-count="99+"
+              />
+              <label for="p1"
+                ><span class="price">Rp10.000</span
+                ><span class="count">99+</span></label
+              >
+            </div>
+            <div class="option">
+              <input
+                type="radio"
+                id="p2"
+                name="paket"
+                value="20000"
+                data-label="Rp20.000 • 130+"
+                data-count="130+"
+                checked
+              />
+              <label for="p2"
+                ><span class="price">Rp20.000</span
+                ><span class="count">130+</span></label
+              >
+            </div>
+            <div class="option">
+              <input
+                type="radio"
+                id="p3"
+                name="paket"
+                value="30000"
+                data-label="Rp30.000 • 200+"
+                data-count="200+"
+              />
+              <label for="p3"
+                ><span class="price">Rp30.000</span
+                ><span class="count">200+</span></label
+              >
+            </div>
+            <div class="option">
+              <input
+                type="radio"
+                id="p4"
+                name="paket"
+                value="40000"
+                data-label="Rp40.000 • 280+"
+                data-count="280+"
+              />
+              <label for="p4"
+                ><span class="price">Rp40.000</span
+                ><span class="count">280+</span></label
+              >
+            </div>
+            <div class="option">
+              <input
+                type="radio"
+                id="p5"
+                name="paket"
+                value="50000"
+                data-label="Rp50.000 • 350+"
+                data-count="350+"
+              />
+              <label for="p5"
+                ><span class="price">Rp50.000</span
+                ><span class="count">350+</span></label
+              >
+            </div>
+            <div class="option">
+              <input
+                type="radio"
+                id="p6"
+                name="paket"
+                value="80000"
+                data-label="Rp80.000 • 650+"
+                data-count="650+"
+              />
+              <label for="p6"
+                ><span class="price">Rp80.000</span
+                ><span class="count">650+</span></label
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div>
+            <small>Paket Dipilih</small>
+            <strong id="selectedPackageText">Rp20.000 • 130+</strong>
+          </div>
+          <div>
+            <small>Total Bayar</small>
+            <strong id="selectedTotalText">Rp20.410</strong>
+          </div>
+        </div>
+
+        <p class="note">
+          ⚡ Nominal pembayaran otomatis ditambah kode unik <strong>410</strong>
+        </p>
+
+        <div class="alert error" id="orderAlert">
+          Silakan isi email yang valid terlebih dahulu.
+        </div>
+
+        <button class="btn" id="payBtn">Lanjutkan Pembayaran →</button>
+        <p class="foot">🔒 Aman • ⚡ Proses cepat • 🎯 Tampilan premium</p>
+      </div>
+
+      <!-- SCREEN 2 : QRIS PAYMENT -->
+      <div class="screen hidden" id="paymentScreen">
+        <div class="top-badge">QR</div>
+
+        <div class="status">
+          <span class="dot"></span>
+          Menunggu Pembayaran QRIS
+        </div>
+
+        <h2>Code QRIS Pembayaran</h2>
+        <div class="subtitle">
+          Scan QRIS • Bayar Sesuai Nominal • Auto Check
+        </div>
+
+        <div class="merchant">RIZKY STORE • QRIS RESMI</div>
+
+        <div class="qris-box">
+          <!-- GANTI src di bawah dengan file QRIS kamu jika sudah disimpan di folder project -->
+          <img
+            id="qrisImage"
+            src="qris-rizky-store.jpg"
+            alt="QRIS RIZKY STORE"
+            onerror="
+              this.src =
+                'https://dummyimage.com/330x470/ffffff/111111&text=UPLOAD+QRIS+RIZKY+STORE'
+            "
+          />
+        </div>
+
+        <div class="payment-card">
+          <span class="mini">Total Nominal</span>
+          <div class="payment-amount" id="paymentAmount">Rp20.410</div>
+          <div class="payment-hint">
+            *Mohon bayar sesuai nominal hingga 3 digit terakhir
+          </div>
+        </div>
+
+        <div class="timer-box">
+          <span class="timer-label">Batas Waktu Pembayaran</span>
+          <div id="countdown">05:00</div>
+        </div>
+
+        <p class="qris-note">
+          Email Target: <strong id="paymentEmail">-</strong><br />
+          Paket: <strong id="paymentPackage">-</strong>
+        </p>
+
+        <div class="alert success" id="checkAlert">
+          Pembayaran sedang dicek... jika sudah transfer, kamu bisa lanjut ke
+          WhatsApp admin.
+        </div>
+
+        <button class="btn" id="checkBtn">⟳ Cek Pembayaran</button>
+        <button class="btn-secondary" id="backBtn">← Kembali ke Form</button>
+      </div>
+    </div>
+
+    <script>
+      const orderScreen = document.getElementById("orderScreen");
+      const paymentScreen = document.getElementById("paymentScreen");
+      const emailInput = document.getElementById("emailInput");
+      const payBtn = document.getElementById("payBtn");
+      const backBtn = document.getElementById("backBtn");
+      const checkBtn = document.getElementById("checkBtn");
+      const orderAlert = document.getElementById("orderAlert");
+      const checkAlert = document.getElementById("checkAlert");
+
+      const selectedPackageText = document.getElementById(
+        "selectedPackageText",
+      );
+      const selectedTotalText = document.getElementById("selectedTotalText");
+      const paymentAmount = document.getElementById("paymentAmount");
+      const paymentEmail = document.getElementById("paymentEmail");
+      const paymentPackage = document.getElementById("paymentPackage");
+      const countdownEl = document.getElementById("countdown");
+
+      const paketRadios = document.querySelectorAll('input[name="paket"]');
+      const uniqueCode = 410;
+      let countdownInterval;
+      let remainingSeconds = 300;
+
+      function formatRupiah(number) {
+        return "Rp" + number.toLocaleString("id-ID");
+      }
+
+      function getSelectedPackage() {
+        return document.querySelector('input[name="paket"]:checked');
+      }
+
+      function updateSummary() {
+        const selected = getSelectedPackage();
+        const basePrice = Number(selected.value);
+        const total = basePrice + uniqueCode;
+        selectedPackageText.textContent = selected.dataset.label;
+        selectedTotalText.textContent = formatRupiah(total);
+        paymentAmount.textContent = formatRupiah(total);
+        paymentPackage.textContent = selected.dataset.label;
+      }
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function startCountdown() {
+        clearInterval(countdownInterval);
+        remainingSeconds = 300;
+        renderCountdown();
+
+        countdownInterval = setInterval(() => {
+          remainingSeconds--;
+          renderCountdown();
+
+          if (remainingSeconds <= 0) {
+            clearInterval(countdownInterval);
+            countdownEl.textContent = "EXPIRED";
+          }
+        }, 1000);
+      }
+
+      function renderCountdown() {
+        const minutes = String(Math.floor(remainingSeconds / 60)).padStart(
+          2,
+          "0",
+        );
+        const seconds = String(remainingSeconds % 60).padStart(2, "0");
+        countdownEl.textContent = `${minutes}:${seconds}`;
+      }
+
+      paketRadios.forEach((radio) => {
+        radio.addEventListener("change", updateSummary);
+      });
+
+      payBtn.addEventListener("click", () => {
+        const email = emailInput.value.trim();
+
+        if (!isValidEmail(email)) {
+          orderAlert.classList.add("show");
+          return;
+        }
+
+        orderAlert.classList.remove("show");
+        paymentEmail.textContent = email;
+        updateSummary();
+
+        orderScreen.classList.add("hidden");
+        paymentScreen.classList.remove("hidden");
+        checkAlert.classList.remove("show");
+        startCountdown();
+      });
+
+      backBtn.addEventListener("click", () => {
+        paymentScreen.classList.add("hidden");
+        orderScreen.classList.remove("hidden");
+        clearInterval(countdownInterval);
+      });
+
+      checkBtn.addEventListener("click", () => {
+        checkAlert.classList.add("show");
+      });
+
+      updateSummary();
+    </script>
+  </body>
+</html>
